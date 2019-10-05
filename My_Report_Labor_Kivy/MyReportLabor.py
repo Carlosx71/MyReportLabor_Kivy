@@ -1,3 +1,12 @@
+from win10toast import ToastNotifier 
+from datetime import timedelta, date
+from threading import Thread
+import http.client, urllib.parse
+import datetime
+import base64
+import requests
+import json
+import os
 import kivy
 from kivy.app import App
 from kivy.uix.label import Label
@@ -42,6 +51,47 @@ class MyReportScreen(ScreenManager):
     pass
 
 class MyReportLoginScreen(Screen):
+
+    #self.urlHttp = "http://suportedev.maxinst.intra"
+    #self.servidor = "suportedev.maxinst.intra"
+    urlHttp = "http://suporte.maxinst.intra"
+    servidor = "suporte.maxinst.intra"
+    
+    def changeScreen(self):
+        myreportswscreen = self.manager.ids.MyReportSWScreen
+        self.manager.current = 'MyReportSWScreen'
+        #self.bind(on_press=self.myreportswscreen.transTela)
+    
+    def login(self):
+        print('Entrou no Login')
+        usuario = 'carlos.santos'
+        senha = 'chobits'
+        noencoder_maxauth= usuario+':'+senha
+        encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        url = self.servidor+"/maximo/rest/mbo/PERSON/"
+        querystring = {"personid":usuario,"_format":"json"}
+        conn = http.client.HTTPConnection(self.servidor)
+        payload = ""
+        senha = str(encoder_maxauth)
+        print(senha[1:])
+        headers = {
+           'maxauth': senha[1:],
+           'cache-control': "no-cache",
+           'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
+           }
+        print('Chegou no headers')
+        conn.request("GET", self.urlHttp+"/maximo/rest/mbo/PERSON?_format=json&personid="+usuario, payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print(data.decode("utf-8"))
+        response = data.decode("utf-8")
+        if response[:21] == "Error 400: BMXAA7901E":
+        	print("ERRO......")
+        else:
+            self.changeScreen()
+
+
+
     def load(self, pessoa):
         #Instaciando a tela para navegacao buscando no arquivo KV
         myreportswscreen = self.manager.ids.MyReportSWScreen
@@ -64,6 +114,7 @@ class MyButton(Button):
     def __init__(self,myreportswscreen, nome, idade, **kwargs):
         super(MyButton, self).__init__(**kwargs)
 
+        #Construindo o botao
         self.text = nome
         self.size_hint_y = None
         self.height = '300dp'

@@ -26,8 +26,9 @@
         BoxLayout:
             #v_userName: username
             #v_password: password
+            pos_hint: {"center_x":.6, "center_y":.6}
             GridLayout:
-                rows: 2
+                rows: 3
                 cols: 2
                 padding: 2
                 spacing: 2
@@ -40,6 +41,7 @@
                 #rows_minimum: '100dp'
                 Label:
                     text: 'Usuario'
+                    pos_hint: {'right': 2}
                     size_hint_y: None
                     #size_hint_x: None
                     #width: '500dp'
@@ -62,13 +64,34 @@
                     password: True
                     size_hint_x: None
                     width: '250dp'
-        BoxLayout:
-            CustomButton:
-                size_hint: 1, .4
-                pos_hint: {'y': .3}
-                text: 'Logar'
-                #evento de precionar do botao
-                on_press: app.stop()
+                Label:
+                    text: ''
+                Button:
+                    #size_hint: 1, .4
+                    pos_hint: {"center_x":.10, "center_y":.3}
+                    size_hint: None, None
+                    height: '30dp'
+                    width: '250dp'
+                    text: 'Logar'
+                    #evento de precionar do botao
+                    #on_press: app.stop()
+                    on_press: root.login()
+        #BoxLayout:
+        #    pos_hint: {"center_x":.8, "center_y":.6}
+        #    GridLayout:
+        #        rows: 1
+        #        cols: 1
+        #        padding: 2
+#
+        #        CustomButton:
+        #            #size_hint: 1, .4
+        #            pos_hint: {"center_x":.10, "center_y":.3}
+        #            size_hint: None, None
+        #            height: '50dp'
+        #            width: '250dp'
+        #            text: 'Logar'
+        #            #evento de precionar do botao
+        #            on_press: app.stop()
 
         #DrillDown
         Spinner:
@@ -119,27 +142,3 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-
-
-
-
-
-
-
-
-    #v_userName: username
-    #v_password: password
-    #GridLayout:
-    #    rows: 2
-    #    cols: 2
-    #    padding: 10
-    #    spacing: 10
-    #    Label:
-    #        text: 'Usuario'
-    #    TextInput:
-    #        id: username
-    #    Label:
-    #        text: 'Senha'
-    #    TextInput:
-    #        id: password
-    #        password: True
