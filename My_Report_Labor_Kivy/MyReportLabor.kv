@@ -1,115 +1,145 @@
 <MyReportScreen>:
 
-    size_hint: None, None
-    canvas.before:
-        Color:
-            rgba: 96, 96, 96, 0.3  #gray
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    MyReportLoginScreen
+        name: 'MyReportLoginScreen'
+        id: MyReportLoginScreen
+    MyReportSWScreen:
+        name: 'MyReportSWScreen'
+        id: MyReportSWScreen
 
+<MyReportLoginScreen>:
     BoxLayout:
-        canvas.before:
-            Color:
-                rgba: 90,27,30,0.7  # blue
-            Rectangle:
-                pos: self.pos
-                size: self.size
-
-        size: self.parent.size  # important!
-        pos: self.parent.pos  # important!
+        #center: root.center
+        #Barra superior
         orientation: 'vertical'
-        CTextInput:
+        ActionBar: 
+            ActionView:
+                ActionPrevious:
+                    title: 'My Report Labor'
+                    with_previous: False
+                    app_icon: ''
+                #ActionButton:
+            #        text: 'Button1'
+            #    
+            #    ActionButton:
+            #        text: 'Button2'
+        BoxLayout:
+            #v_userName: username
+            #v_password: password
+            GridLayout:
+                rows: 2
+                cols: 2
+                padding: 2
+                spacing: 2
+                height: self.minimum_height
+                row_force_default: True
+                size_hint_y: None
+                size_hint_x: None
+                row_default_height: '32dp'
+                width: self.parent.width * 0.600
+                #rows_minimum: '100dp'
+                Label:
+                    text: 'Usuario'
+                    size_hint_y: None
+                    #size_hint_x: None
+                    #width: '500dp'
+                    height: '30dp'
+                TextInput:
+                    id: username
+                    size_hint_y: None
+                    height: '30dp'
+                    size_hint_x: None
+                    width: '250dp'
+
+                Label:
+                    text: 'Senha'
+                    size_hint_y: None
+                    height: '30dp'
+                TextInput:
+                    id: password
+                    size_hint_y: None
+                    height: '30dp'
+                    password: True
+                    size_hint_x: None
+                    width: '250dp'
+        BoxLayout:
+            CustomButton:
+                size_hint: 1, .4
+                pos_hint: {'y': .3}
+                text: 'Logar'
+                #evento de precionar do botao
+                on_press: app.stop()
+
+        #DrillDown
+        Spinner:
+            id: spinnerJogador
             size_hint_y: None
-            height: '32dp'
-            multiline: False
-        CTextInput:
-            size_hint_y: None
-            label: 'Senha'
-            height: '32dp'
-            password: True
-        Button:
-            size_hint_x: None
-            size_hint_y: None
-            height: '30dp'
-            text: 'Autenticar'
+            background_normal: ''
+            color: 0,0,0,1
+            height: '50dp'
+            text: 'Selecione um jogador'
+            #Valores do DrillDown
+            values: ['Carlos', 'Veronica']
+            #Chama um funcao na classe MyReportScreen que a classe root
+            on_text: root.load(self.text)
+            
+        ScrollView:
+            BoxLayout:
+                id: box1
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+<CustomButton@Button>:
+    background_color: 75, 50, 50, 0.5
+    size_hint_y: None
+    #size_hint_x: None
+    height: self.parent.height * 0.300
+    #height: self.parent.width * 0.111
+
+#Define as propriedades dos botoes dentro do drillDown
+<Spinnneroption>:
+    background_down: ''
+    background_normal: ''
+    color: 0,0,0,1
+
+<MyReportSWScreen>:
+    BoxLayout:
+        #Barra superior
+        orientation: 'vertical'
+        ActionBar: 
+            ActionView:
+                ActionPrevious:
+                    #Volta para a tela de login
+                    on_release: root.manager.current = 'MyReportLoginScreen'
+                    title: 'My Report Labor - SR e Work Orders'
+                    app_icon: ''
+        ScrollView:
+            BoxLayout:
+                id: box2
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
 
 
-<CTextInput@TextInput>
-    on_focus:
-        screen = self.parent.parent.parent.parent
-        if screen.parent: screen.focused = self
 
-<MyReportUI>:
-    AnchorLayout:
-        canvas.before:
-            Color:
-                rgba: 96, 96, 96, 0.3  # white
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        size: self.parent.size
-        anchor_x: 'center'
-        anchor_y: 'center'
-        MyReportScreen:
-            size: 200, 80
-    #rientation: 'vertical'
-    #anvas.before:
-    #   Color:
-    #       rgba:   # blue
-    #   Rectangle:
-    #       pos: self.pos
-    #       size: self.size
-    #Label:
-    #    text: 'this on top'
-    #Label:
-    #    text: 'this right aligned'
-    #    size_hint_x: None
-    #    size: self.texture_size
-    #    pos_hint: {'right': 1}
-    #Label:
-    #    text: 'this on bottom'
-    #Label:
-    #    font_size: 24
-    #    text: 'iuqwdouqwdoqdwpqwpow'
-    #    color: 0.447, 0.094, 0.737, 1
-    #    text_size: root.width, None
-    #    size: self.texture_size
-    #    padding_x: 200
-#<VgxUI>:
-#    TextInput:
-#        id: ti_default
-#        size_hint_x: 0.2
-#        size_hint_y: None
-#        height: '32dp'
-#        label: 'Usuário'
-#        focus: True
-#        pos_hint: {"x": 0.4, 'top':1}
-#        anchor_x: 'center'
-#        anchor_y: 'center'
-#
-#    TextInput:
-#        size_hint_y: None
-#        size_hint_x: 0.2
-#        height: '32dp'
-#        text: ''
-#        password: True
-#        padding_x:[20,0]
-#        anchor_x: 'center'
-#        anchor_y: 'center'
-#
-#    Button:
-#        size_hint_x: None
-#        size_hint_y: None
-#        height: '30dp'
-#        text: 'Autenticar'
-#        pos_hint: {"x": 0.5, 'top':1}
-#
-#<VgxMainScreen>:
-#    size_hint: None, None
-#    canvas.before:
-#        Color:
-#            rgba: 1, 0, 0, 1  # red
-#        Rectangle:
-#            pos: self.pos
-#            size: self.size
+
+
+
+
+
+    #v_userName: username
+    #v_password: password
+    #GridLayout:
+    #    rows: 2
+    #    cols: 2
+    #    padding: 10
+    #    spacing: 10
+    #    Label:
+    #        text: 'Usuario'
+    #    TextInput:
+    #        id: username
+    #    Label:
+    #        text: 'Senha'
+    #    TextInput:
+    #        id: password
+    #        password: True
