@@ -1,18 +1,20 @@
+import kivy
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.animation import Animation
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
 
-
-class Layout(BoxLayout):
+class MyReportScreen(Widget):
     pass
 
-class MyReportLabor(App):
-    def build(self):
-        return Layout()
-        #return Label(text='Hello World!')
-        #anim = Animation(x=100, y=100)
-        #anim.start(widget)
+class MyReportUI(Widget):
+    pass
 
-MyReportLabor().run()
+class MyReportLaborApp(App):
+    def build(self):
+        return MyReportUI()
+
+MyReportLaborApp().run()

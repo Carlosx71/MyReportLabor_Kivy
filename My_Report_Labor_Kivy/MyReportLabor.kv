@@ -1,27 +1,115 @@
-<Layout>:
+<MyReportScreen>:
 
-    name: 'Buttons'
+    size_hint: None, None
+    canvas.before:
+        Color:
+            rgba: 96, 96, 96, 0.3  #gray
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
-    Button:
-        size_hint_y: None
-        height: '48dp'
-        text: 'Button normal'
+    BoxLayout:
+        canvas.before:
+            Color:
+                rgba: 90,27,30,0.7  # blue
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
-    Button:
-        size_hint_y: None
-        height: '48dp'
-        text: 'Button down'
-        state: 'down'
+        size: self.parent.size  # important!
+        pos: self.parent.pos  # important!
+        orientation: 'vertical'
+        CTextInput:
+            size_hint_y: None
+            height: '32dp'
+            multiline: False
+        CTextInput:
+            size_hint_y: None
+            label: 'Senha'
+            height: '32dp'
+            password: True
+        Button:
+            size_hint_x: None
+            size_hint_y: None
+            height: '30dp'
+            text: 'Autenticar'
 
-    Button:
-        size_hint_y: None
-        height: '48dp'
-        text: 'Button disabled'
-        disabled: True
 
-    Button:
-        size_hint_y: None
-        height: '48dp'
-        text: 'Button down disabled'
-        state: 'down'
-        disabled: True
+<CTextInput@TextInput>
+    on_focus:
+        screen = self.parent.parent.parent.parent
+        if screen.parent: screen.focused = self
+
+<MyReportUI>:
+    AnchorLayout:
+        canvas.before:
+            Color:
+                rgba: 96, 96, 96, 0.3  # white
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        size: self.parent.size
+        anchor_x: 'center'
+        anchor_y: 'center'
+        MyReportScreen:
+            size: 200, 80
+    #rientation: 'vertical'
+    #anvas.before:
+    #   Color:
+    #       rgba:   # blue
+    #   Rectangle:
+    #       pos: self.pos
+    #       size: self.size
+    #Label:
+    #    text: 'this on top'
+    #Label:
+    #    text: 'this right aligned'
+    #    size_hint_x: None
+    #    size: self.texture_size
+    #    pos_hint: {'right': 1}
+    #Label:
+    #    text: 'this on bottom'
+    #Label:
+    #    font_size: 24
+    #    text: 'iuqwdouqwdoqdwpqwpow'
+    #    color: 0.447, 0.094, 0.737, 1
+    #    text_size: root.width, None
+    #    size: self.texture_size
+    #    padding_x: 200
+#<VgxUI>:
+#    TextInput:
+#        id: ti_default
+#        size_hint_x: 0.2
+#        size_hint_y: None
+#        height: '32dp'
+#        label: 'Usuário'
+#        focus: True
+#        pos_hint: {"x": 0.4, 'top':1}
+#        anchor_x: 'center'
+#        anchor_y: 'center'
+#
+#    TextInput:
+#        size_hint_y: None
+#        size_hint_x: 0.2
+#        height: '32dp'
+#        text: ''
+#        password: True
+#        padding_x:[20,0]
+#        anchor_x: 'center'
+#        anchor_y: 'center'
+#
+#    Button:
+#        size_hint_x: None
+#        size_hint_y: None
+#        height: '30dp'
+#        text: 'Autenticar'
+#        pos_hint: {"x": 0.5, 'top':1}
+#
+#<VgxMainScreen>:
+#    size_hint: None, None
+#    canvas.before:
+#        Color:
+#            rgba: 1, 0, 0, 1  # red
+#        Rectangle:
+#            pos: self.pos
+#            size: self.size
