@@ -8,6 +8,9 @@
         id: MyReportSWScreen
 
 <MyReportLoginScreen>:
+    #Variaveis globais
+    username: username
+    password: password
     BoxLayout:
         #center: root.center
         #Barra superior
@@ -17,16 +20,28 @@
                 ActionPrevious:
                     title: 'My Report Labor'
                     with_previous: False
-                    app_icon: ''
-                #ActionButton:
+                    app_icon: 'report.png'
+
+                    #ActionButton:
             #        text: 'Button1'
             #    
             #    ActionButton:
             #        text: 'Button2'
+        #BoxLayout:           
+        #    pos_hint: {"center_x":0.5, "center_y":0.5}
+        #    #size_hint: None, None
+        #    #size_hint_y: '0.5dp'
+        #    #row_default_height: '32dp'
+        #    #height: self.parent.height * 0.300 
+        #    #width: self.parent.width * 0.100
+        Image:
+            id: maxinst_logo
+            source: 'logo-maxinst.png'
         BoxLayout:
             #v_userName: username
             #v_password: password
             pos_hint: {"center_x":.6, "center_y":.6}
+            padding : [50,50,50,50]
             GridLayout:
                 rows: 3
                 cols: 2
@@ -37,25 +52,25 @@
                 size_hint_y: None
                 size_hint_x: None
                 row_default_height: '32dp'
-                width: self.parent.width * 0.600
+                width: self.parent.width * 0.500
                 #rows_minimum: '100dp'
                 Label:
                     text: 'Usuario'
-                    pos_hint: {'right': 2}
-                    size_hint_y: None
-                    #size_hint_x: None
-                    #width: '500dp'
+                    size_hint: None, None
+                    width: self.parent.width * 0.600
                     height: '30dp'
                 TextInput:
                     id: username
                     size_hint_y: None
                     height: '30dp'
                     size_hint_x: None
-                    width: '250dp'
+                    width: self.parent.width * 0.500
+                    multiline: False
 
                 Label:
                     text: 'Senha'
-                    size_hint_y: None
+                    size_hint: None, None
+                    width: self.parent.width * 0.600
                     height: '30dp'
                 TextInput:
                     id: password
@@ -63,7 +78,8 @@
                     height: '30dp'
                     password: True
                     size_hint_x: None
-                    width: '250dp'
+                    width: self.parent.width * 0.500
+                    multiline: False
                 Label:
                     text: ''
                 Button:
@@ -71,7 +87,7 @@
                     pos_hint: {"center_x":.10, "center_y":.3}
                     size_hint: None, None
                     height: '30dp'
-                    width: '250dp'
+                    width: self.parent.width * 0.500
                     text: 'Logar'
                     #evento de precionar do botao
                     #on_press: app.stop()
@@ -94,17 +110,17 @@
         #            on_press: app.stop()
 
         #DrillDown
-        Spinner:
-            id: spinnerJogador
-            size_hint_y: None
-            background_normal: ''
-            color: 0,0,0,1
-            height: '50dp'
-            text: 'Selecione um jogador'
-            #Valores do DrillDown
-            values: ['Carlos', 'Veronica']
-            #Chama um funcao na classe MyReportScreen que a classe root
-            on_text: root.load(self.text)
+        #Spinner:
+        #    id: spinnerJogador
+        #    size_hint_y: None
+        #    background_normal: ''
+        #    color: 0,0,0,1
+        #    height: '50dp'
+        #    text: 'Selecione um jogador'
+        #    #Valores do DrillDown
+        #    values: ['Carlos', 'Veronica']
+        #    #Chama um funcao na classe MyReportScreen que a classe root
+        #    on_text: root.load(self.text)
             
         ScrollView:
             BoxLayout:

@@ -17,6 +17,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.image import Image
 
 class JsonRestMaximo():
     jsonRest = [{'Carlos':{
@@ -56,16 +57,18 @@ class MyReportLoginScreen(Screen):
     #self.servidor = "suportedev.maxinst.intra"
     urlHttp = "http://suporte.maxinst.intra"
     servidor = "suporte.maxinst.intra"
-    
     def changeScreen(self):
         myreportswscreen = self.manager.ids.MyReportSWScreen
         self.manager.current = 'MyReportSWScreen'
         #self.bind(on_press=self.myreportswscreen.transTela)
     
     def login(self):
+        #username = self.username.text
+        #password = self.password.text
+        #print(str(username) + str(password))
         print('Entrou no Login')
-        usuario = 'carlos.santos'
-        senha = 'chobits'
+        usuario = self.username.text
+        senha = self.password.text
         noencoder_maxauth= usuario+':'+senha
         encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
         url = self.servidor+"/maximo/rest/mbo/PERSON/"
@@ -122,6 +125,9 @@ class MyButton(Button):
         #Amarra para tela MyReportSWScreen
         self.myreportswscreen = myreportswscreen
         self.bind(on_press=self.myreportswscreen.transTela)
+
+class TextInput(Widget):
+    pass
 
 class MyReportSWScreen(Screen):
         def transTela(self, *args):
