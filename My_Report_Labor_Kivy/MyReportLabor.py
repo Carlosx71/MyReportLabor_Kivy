@@ -1,4 +1,4 @@
-from win10toast import ToastNotifier 
+#from win10toast import ToastNotifier 
 from datetime import timedelta, date
 from threading import Thread
 import http.client, urllib.parse
@@ -137,4 +137,4 @@ class MyReportLaborApp(App):
     def build(self):
         return MyReportScreen()
 
-MyReportLaborApp().run()
+MyReportLaborApp(kv_file='MyReportLabor.kv').run()
