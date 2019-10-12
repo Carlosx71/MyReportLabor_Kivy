@@ -155,7 +155,17 @@
                     app_icon: ''
         ScrollView:
             BoxLayout:
-                id: box2
+                id: boxSRWO
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
+                Button:
+                    size_hint_y: None
+                    width: self.parent.width * 0.300
+                    height: '50dp'
+                    text: 'Listar'
+
+                    on_press: root.listSRandWO()
+
+<WOScreen>:
+

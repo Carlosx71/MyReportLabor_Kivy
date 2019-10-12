@@ -8,6 +8,7 @@ import requests
 import json
 import os
 import kivy
+import time
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.animation import Animation
@@ -18,6 +19,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.image import Image
+from kivy.properties import ObjectProperty, StringProperty
+from kivy.uix.accordion import Accordion, AccordionItem
 
 class JsonRestMaximo():
     jsonRest = [{'Carlos':{
@@ -57,81 +60,165 @@ class MyReportLoginScreen(Screen):
     #self.servidor = "suportedev.maxinst.intra"
     urlHttp = "http://suporte.maxinst.intra"
     servidor = "suporte.maxinst.intra"
-    def changeScreen(self):
-        myreportswscreen = self.manager.ids.MyReportSWScreen
-        self.manager.current = 'MyReportSWScreen'
-        #self.bind(on_press=self.myreportswscreen.transTela)
-    
+    #def changeScreen(self):
+    #    myreportswscreen = self.manager.ids.MyReportSWScreen
+    #    self.manager.current = 'MyReportSWScreen'
+    #    #self.bind(on_press=self.myreportswscreen.transTela)
+    def transTela(self, *args):
+        self.manager.current = 'MyReportLoginScreen'    
+
     def login(self):
-        #username = self.username.text
-        #password = self.password.text
         #print(str(username) + str(password))
         print('Entrou no Login')
         usuario = self.username.text
         senha = self.password.text
-        noencoder_maxauth= usuario+':'+senha
-        encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
-        url = self.servidor+"/maximo/rest/mbo/PERSON/"
-        querystring = {"personid":usuario,"_format":"json"}
-        conn = http.client.HTTPConnection(self.servidor)
-        payload = ""
-        senha = str(encoder_maxauth)
-        print(senha[1:])
-        headers = {
-           'maxauth': senha[1:],
-           'cache-control': "no-cache",
-           'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
-           }
-        print('Chegou no headers')
-        conn.request("GET", self.urlHttp+"/maximo/rest/mbo/PERSON?_format=json&personid="+usuario, payload, headers)
-        res = conn.getresponse()
-        data = res.read()
-        print(data.decode("utf-8"))
-        response = data.decode("utf-8")
-        if response[:21] == "Error 400: BMXAA7901E":
-        	print("ERRO......")
-        else:
-            self.changeScreen()
-
-
-
-    def load(self, pessoa):
-        #Instaciando a tela para navegacao buscando no arquivo KV
+        #noencoder_maxauth= usuario+':'+senha
+        #encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        #url = self.servidor+"/maximo/rest/mbo/PERSON/"
+        #querystring = {"personid":usuario,"_format":"json"}
+        #conn = http.client.HTTPConnection(self.servidor)
+        #payload = ""
+        #senha = str(encoder_maxauth)
+        #print(senha[1:])
+        #headers = {
+        #   'maxauth': senha[1:],
+        #   'cache-control': "no-cache",
+        #   'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
+        #   }
+        #print('Chegou no headers')
+        #conn.request("GET", self.urlHttp+"/maximo/rest/mbo/PERSON?_format=json&personid="+usuario, payload, headers)
+        #res = conn.getresponse()
+        #data = res.read()
+        #print(data.decode("utf-8"))
+        #response = data.decode("utf-8")
+        #if response[:21] == "Error 400: BMXAA7901E":
+        #	print("ERRO......")
+        #else:
+        #self.changeScreen()
         myreportswscreen = self.manager.ids.MyReportSWScreen
-        #Pega a lista do jsonRest
-        jsonPessoa = JsonRestMaximo.jsonRest
-        if pessoa == 'Carlos':
-            for x, i in jsonPessoa[0]['Carlos'].items():
-                #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
-                self.ids.box1.add_widget(MyButton(myreportswscreen, i['nome'], i['idade']))
-                print(str(x))
-                print(str(i))
-        elif pessoa == 'Veronica':
-            for x, i in jsonPessoa[1]['Veronica'].items():
-                #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
-                self.ids.box1.add_widget(MyButton(myreportswscreen, i['nome'], i['idade']))
-                print(str(x))
-                print(str(i))
+        self.manager.current = 'MyReportSWScreen'
+        #MyReportSWScreen.listSRandWO(self)
+    #    #self.bind(on_press=self.myreportswscreen.transTela)
+
+
+
+    #def load(self, pessoa):
+    #    #Instaciando a tela para navegacao buscando no arquivo KV
+    #    myreportswscreen = self.manager.ids.MyReportSWScreen
+    #    #Pega a lista do jsonRest
+    #    jsonPessoa = JsonRestMaximo.jsonRest
+    #    if pessoa == 'Carlos':
+    #        for x, i in jsonPessoa[0]['Carlos'].items():
+    #            #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
+    #            self.ids.box1.add_widget(MyButton(myreportswscreen, i['nome'], i['idade']))
+    #            print(str(x))
+    #            print(str(i))
+    #    elif pessoa == 'Veronica':
+    #        for x, i in jsonPessoa[1]['Veronica'].items():
+    #            #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
+    #            self.ids.box1.add_widget(MyButton(myreportswscreen, i['nome'], i['idade']))
+    #            print(str(x))
+    #            print(str(i))
 
 class MyButton(Button):
-    def __init__(self,myreportswscreen, nome, idade, **kwargs):
+    def __init__(self,screen, nome, idade,num, **kwargs):
         super(MyButton, self).__init__(**kwargs)
 
         #Construindo o botao
+        self.id = 'buttonList'+num
         self.text = nome
         self.size_hint_y = None
-        self.height = '300dp'
-
+        self.width = self.width * 0.500
+        self.height = '50dp'
+        self.background_color = 255,255,255,1
+        self.color = 0,0,0,1
+        self.background_normal
         #Amarra para tela MyReportSWScreen
-        self.myreportswscreen = myreportswscreen
-        self.bind(on_press=self.myreportswscreen.transTela)
+        self.screen = screen
+        #self.screens1 = screen
+        self.bind(on_press=self.screen.transTela)
 
-class TextInput(Widget):
-    pass
+        #woscreen = self.manager.ids.WOScreen
+        #self.manager.current = 'WOScreen'
+
 
 class MyReportSWScreen(Screen):
-        def transTela(self, *args):
-            self.manager.current = 'MyReportSWScreen'
+    num = 0
+    btn = ObjectProperty(None)
+    def transTela(self, *args):
+        self.manager.current = 'MyReportSWScreen'
+
+    def count(self):
+        pass
+    def listSRandWO(self):
+        woScreen = self.manager.ids.MyReportLoginScreen
+        print('listSRandWO')
+        jsonPessoa = JsonRestMaximo.jsonRest
+        self.num = self.num + 1
+        for x, i in jsonPessoa[0]['Carlos'].items():
+        #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
+            if self.num == 1:
+                self.ids.boxSRWO.add_widget(MyButton(woScreen, i['nome'], i['idade'], str(self.num)))
+                print(str(x))
+                print(str(i))
+            else:
+                self.remove_widge(MyButton(self.btn))
+        print(self.num)
+        #noencoder_maxauth=usuario+':'+senha
+        #encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        #laborcode = self.recuperaLabor()
+        ##url = self.sevidor+"/maximo/rest/mbo/WPLABOR/?_format=json&laborcode="+laborcode
+        #url = self.urlHttp+"/maximo/oslc/script/MAXINSTWORKITENS_SR"
+        #querystring = ""
+        #conn = http.client.HTTPConnection(self.servidor)
+        #payload = ""
+        #senha = str(encoder_maxauth)
+        #print(senha[1:])
+        #headers = {
+        #   'maxauth': senha[1:],
+        #   'cache-control': "no-cache",
+        #   'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
+        #   }
+        #print(headers)
+        #print(url)       
+        #conn.request("GET", self.urlHttp+"/maximo/oslc/script/MAXINSTWORKITENS_SR?_format=json", payload, headers)
+        #res = conn.getresponse()
+        #data = res.read()
+        #print('\033[32m '+data.decode("utf-8")+' \033[m')	
+        #response = data.decode("utf-8")	
+        ##binary = response.text
+        #jsonToPython = json.loads(response)
+        #self.workitens_sr_des = json.loads(response)
+        #'''
+        #text = '{"data": [{"description": "Workitem Maxinst para Reuni","workitem": "MAX0REUNI"},{"description": "Tarefa Teste","taskid": "10","workitem": "MAX0TESTE"},{"description": "teste da OS de workitem","workitem": "MAX0PROJET"},{"description": "MAXTESTEAPONT","workitem": "MAX0TESTE"}]}'
+        #jsonToPython = json.loads(text)
+        #self.workitens_sr_des = json.loads(text)
+        #'''
+        
+        #workitens_sr_descricao = '{"'
+        #workitens = '{"workitens":["'
+        #for wplabor in jsonToPython["data"]:
+        #	wpdescription = wplabor.get('description')
+        #	wpdescription=wpdescription.replace('"','')
+        #	wpdescription=wpdescription.replace("'","")
+        #	workitemdesc=wplabor.get('workitem')
+        #	workitemdesc = workitemdesc.replace('"','')
+        #	workitemdesc = workitemdesc.replace("'","")
+        #	workitens = workitens + workitemdesc + '","'
+        #	workitens_sr_descricao = workitens_sr_descricao + wplabor.get('workitem')  +'":"' +  wpdescription + '","'
+        #
+        #if workitens != '{"workitens":["':
+        #	workitens=workitens[:-2]
+        #	workitens=workitens+']}'
+        #	workitens_sr_descricao=workitens_sr_descricao[:-2]
+        #	workitens_sr_descricao=workitens_sr_descricao+'}'
+        #	self.workitens_sr_des = json.loads(workitens_sr_descricao)
+        #	return workitens
+        #else:
+        #	return None
+class WOScreen(Screen):
+    def transTela(self, *args):
+        self.manager.current = 'WOScreen'
 
 class MyReportLaborApp(App):
     def build(self):
