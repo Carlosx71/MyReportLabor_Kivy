@@ -1,11 +1,14 @@
 <MyReportScreen>:
-
+    #Telas dentro do ScreenManager
     MyReportLoginScreen:
         name: 'MyReportLoginScreen'
         id: MyReportLoginScreen
     MyReportSWScreen:
         name: 'MyReportSWScreen'
         id: MyReportSWScreen
+    WOScreen:
+        name: 'WOScreen'
+        id: WOScreen
 
 <MyReportLoginScreen>:
     #Variaveis globais
@@ -168,4 +171,19 @@
                     on_press: root.listSRandWO()
 
 <WOScreen>:
-
+    BoxLayout:
+        #Barra superior
+        orientation: 'vertical'
+        ActionBar: 
+            ActionView:
+                ActionPrevious:
+                    #Volta para a tela de login
+                    on_release: root.manager.current = 'MyReportSWScreen'
+                    title: 'My Report Labor - Work Orders'
+                    app_icon: ''
+        ScrollView:
+            BoxLayout:
+                id: boxWOs
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height

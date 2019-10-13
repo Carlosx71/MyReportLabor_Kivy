@@ -136,7 +136,7 @@ class MyButton(Button):
         #Amarra para tela MyReportSWScreen
         self.screen = screen
         #self.screens1 = screen
-        self.bind(on_press=self.screen.transTela)
+        self.bind(on_press=self.screen.transTelaWOScreen)
 
         #woscreen = self.manager.ids.WOScreen
         #self.manager.current = 'WOScreen'
@@ -146,12 +146,12 @@ class MyReportSWScreen(Screen):
     num = 0
     btn = ObjectProperty(None)
     def transTela(self, *args):
-        self.manager.current = 'MyReportSWScreen'
+        self.manager.current = 'WOScreen'
 
     def count(self):
         pass
     def listSRandWO(self):
-        woScreen = self.manager.ids.MyReportLoginScreen
+        woScreen = self.manager.ids.WOScreen
         print('listSRandWO')
         jsonPessoa = JsonRestMaximo.jsonRest
         self.num = self.num + 1
@@ -217,7 +217,8 @@ class MyReportSWScreen(Screen):
         #else:
         #	return None
 class WOScreen(Screen):
-    def transTela(self, *args):
+    def transTelaWOScreen(self, *args):
+        print('WOScreen')
         self.manager.current = 'WOScreen'
 
 class MyReportLaborApp(App):
