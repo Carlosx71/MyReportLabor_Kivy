@@ -141,6 +141,41 @@ class MyButton(Button):
         #woscreen = self.manager.ids.WOScreen
         #self.manager.current = 'WOScreen'
 
+class MyButton(Button):
+    def __init__(self,screen, nome, idade,num, **kwargs):
+        super(MyButton, self).__init__(**kwargs)
+
+        #Construindo o botao
+        self.id = 'buttonList'+num
+        self.text = nome
+        self.size_hint_y = None
+        self.width = self.width * 0.500
+        self.height = '50dp'
+        self.background_color = 255,255,255,1
+        self.color = 0,0,0,1
+        self.background_normal
+        #Amarra para tela MyReportSWScreen
+        self.screen = screen
+        #self.screens1 = screen
+        self.bind(on_press=self.screen.transTelaWOScreen)
+
+class MyButtonWO(Button):
+    def __init__(self,screen, nome, idade,num, **kwargs):
+        super(MyButtonWO, self).__init__(**kwargs)
+
+        #Construindo o botao
+        self.id = 'buttonList'
+        self.text = nome
+        self.size_hint_y = None
+        self.width = self.width * 0.500
+        self.height = '50dp'
+        self.background_color = 255,255,255,1
+        self.color = 0,0,0,1
+        self.background_normal
+        #Amarra para tela MyReportSWScreen
+        self.screen = screen
+        #self.screens1 = screen
+        self.bind(on_press=self.screen.transTelaWOScreen)
 
 class MyReportSWScreen(Screen):
     num = 0
@@ -158,11 +193,11 @@ class MyReportSWScreen(Screen):
         for x, i in jsonPessoa[0]['Carlos'].items():
         #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
             if self.num == 1:
-                self.ids.boxSRWO.add_widget(MyButton(woScreen, i['nome'], i['idade'], str(self.num)))
+                self.ids.boxSRWO.add_widget(MyButtonWO(woScreen, i['nome'], i['idade'], str(self.num)))
                 print(str(x))
                 print(str(i))
             else:
-                self.remove_widge(MyButton(self.btn))
+                self.ids.boxSRWO.remove_widget(MyButtonWO(woScreen, i['nome'], i['idade'], str(self.num)))
         print(self.num)
         #noencoder_maxauth=usuario+':'+senha
         #encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
@@ -218,7 +253,6 @@ class MyReportSWScreen(Screen):
         #	return None
 class WOScreen(Screen):
     def transTelaWOScreen(self, *args):
-        print('WOScreen')
         self.manager.current = 'WOScreen'
 
 class MyReportLaborApp(App):
