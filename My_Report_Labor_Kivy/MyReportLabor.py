@@ -9,18 +9,19 @@ import json
 import os
 import kivy
 import time
-from kivy.app import App
-from kivy.uix.label import Label
-from kivy.animation import Animation
-from kivy.uix.button import Button
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
-from kivy.uix.widget import Widget
-from kivy.uix.gridlayout import GridLayout
+from kivy.app               import App
+from kivy.uix.label         import Label
+from kivy.animation         import Animation
+from kivy.uix.button        import Button
+from kivy.uix.boxlayout     import BoxLayout
+from kivy.uix.textinput     import TextInput
+from kivy.uix.widget        import Widget
+from kivy.uix.gridlayout    import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
-from kivy.uix.image import Image
-from kivy.properties import ObjectProperty, StringProperty
-from kivy.uix.accordion import Accordion, AccordionItem
+from kivy.uix.image         import Image
+from kivy.properties        import ObjectProperty, StringProperty
+from kivy.uix.accordion     import Accordion, AccordionItem
+from kivy.uix.stacklayout   import StackLayout
 
 class JsonRestMaximo():
     jsonRest = [{'Carlos':{
@@ -164,18 +165,20 @@ class MyButtonWO(Button):
         super(MyButtonWO, self).__init__(**kwargs)
 
         #Construindo o botao
-        self.id = 'buttonList'
+        self.id = 'buttonList'+num
         self.text = nome
         self.size_hint_y = None
         self.width = self.width * 0.500
         self.height = '50dp'
         self.background_color = 255,255,255,1
         self.color = 0,0,0,1
-        self.background_normal
+        #self.background_normal
         #Amarra para tela MyReportSWScreen
         self.screen = screen
         #self.screens1 = screen
         self.bind(on_press=self.screen.transTelaWOScreen)
+        self.bind(on_press=self.screen.teste)
+
 
 class MyReportSWScreen(Screen):
     num = 0
@@ -254,6 +257,9 @@ class MyReportSWScreen(Screen):
 class WOScreen(Screen):
     def transTelaWOScreen(self, *args):
         self.manager.current = 'WOScreen'
+
+    def teste(self, *args):
+        print('To na WoScreen')
 
 class MyReportLaborApp(App):
     def build(self):

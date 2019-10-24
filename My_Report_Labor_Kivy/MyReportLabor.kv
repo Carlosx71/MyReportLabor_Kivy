@@ -1,5 +1,11 @@
 <MyReportScreen>:
+    canvas:
+        Color:
+            # #263238
+            rgb: 0x26 / 255.0, 0x32 / 255.0, 0x38 / 255.0
 
+        Rectangle:
+            size: self.size
     MyReportLoginScreen:
         name: 'MyReportLoginScreen'
         id: MyReportLoginScreen
@@ -167,10 +173,24 @@
                     width: self.parent.width * 0.300
                     height: '50dp'
                     text: 'Listar'
-
+                    background_color: 67, 241, 54, 0.5
                     on_press: root.listSRandWO()
+                    StackLayout:
+                        pos: self.parent.pos
+                        size: self.parent.size
+                        orientation: 'lr-tb'
+                        Image:
+                            source: 'list-icon.png'
+                            size_hint_x: None
+                            width: 74
 
 <WOScreen>:
+    #canvas.before:
+    #    Color:
+    #        rgba: 14, 16, 36, 0.5
+    #    Rectangle:
+    #        pos: self.pos
+    #        size: self.size
     BoxLayout:
         #Barra superior
         orientation: 'vertical'
@@ -181,9 +201,97 @@
                     on_release: root.manager.current = 'MyReportSWScreen'
                     title: 'My Report Labor - Work Orders'
                     app_icon: ''
+        BoxLayout:
+            orientation: 'vertical'
+            #padding: 30
+            #    canvas.before:
+            GridLayout:
+                rows: 5
+                cols: 3
+                padding: 20
+                spacing: 2
+                #size_hint_y: None
+                #height: self.minimum_height
+                #row_default_height: '30dp'
+                #row_force_default: True
+                #rows_minimum: '100dp'
+                BoxLayout:
+                    orientation: 'vertical'
+                    GridLayout:
+                        rows: 2
+                        cols: 1
+                        padding: 3
+                    Label:
+                        text: 'Work Order'
+                        halign: 'left'
+                        text_size: self.size
+                        size_hint_y: None
+                        height: '20dp'
+                    TextInput:
+                        id: workOrder
+                        text: 'WO1026'
+                        size_hint: None, None
+                        width: self.parent.width * 0.400
+                        height: '30dp'
+                        multiline: False
+                        disabled: True                        
+                Label:
+                    text: 'Work Order'
+                    halign: 'left'
+                    text_size: self.size
+                    size_hint_y: None
+                    height: '20dp'
+                    #valign: 'middle'
+                Label:
+                    text: 'Descricao'
+                    halign: 'left'
+                    text_size: self.size
+                    #valign: 'middle'                  
+                Label:
+                    text: ''
+                    height: '30dp'
+                BoxLayout:
+                    TextInput:
+                        text: 'WO1026'
+                        size_hint: None, None
+                        width: self.parent.width * 0.400
+                        height: '30dp'
+                        multiline: False
+                        disabled: True
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'                    
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
+                Label:
+                    text: 'Usuario'
+                    height: '30dp'
         ScrollView:
             BoxLayout:
                 id: boxWOs
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
+                
