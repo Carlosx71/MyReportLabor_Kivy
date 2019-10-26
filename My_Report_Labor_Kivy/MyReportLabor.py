@@ -23,7 +23,7 @@ from kivy.properties        import ObjectProperty, StringProperty
 from kivy.uix.accordion     import Accordion, AccordionItem
 from kivy.uix.stacklayout   import StackLayout
 
-class JsonRestMaximo():
+class JsonRestMaximo(Screen):
     jsonRest = [{'Carlos':{
                     'Heroi 1': {
                         'nome':'Dante', 
@@ -52,6 +52,39 @@ class JsonRestMaximo():
                 },                
                 ]
 
+    def jsonGetLabor(self,username, password):
+        usuario = username
+        senha = password
+        noencoder_maxauth = usuario+':'+senha
+        encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        url = MyReportLoginScreen.urlHttp + "/maximo/rest/mbo/LABOR/"
+        querystring = {"personid":usuario,"_format":"json"}
+        payload = ""
+	    #data = {}
+        senha = str(encoder_maxauth)
+        print(senha[1:])
+        headers = {
+           'maxauth': senha[1:],
+           'cache-control': "no-cache",
+           'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
+           }
+        conn = http.client.HTTPConnection("suporte.maxinst.intra")
+        #print(headers)
+        #h = json.loads(headers)
+        conn.request("GET", '/maximo/rest/mbo/LABOR?_format=json&personid="'+usuario+'"', payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print("\033[33m" + data.decode("utf-8") + "\033[m")
+        response = data.decode("utf-8")
+        #response = requests.request("GET", url, data=payload, headers=h, params=querystring)
+        #print(response.text)
+        #binary = response.text
+        jsonToPython = json.loads(response)
+        labor = jsonToPython["LABORMboSet"]['LABOR'][0]
+        attributes = labor['Attributes']
+        print(attributes.get('LABORCODE').get('content'))
+        #return attributes.get('LABORCODE').get('content')++
+
 class MyReportScreen(ScreenManager):
     pass
 
@@ -73,31 +106,40 @@ class MyReportLoginScreen(Screen):
         print('Entrou no Login')
         usuario = self.username.text
         senha = self.password.text
-        #noencoder_maxauth= usuario+':'+senha
-        #encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
-        #url = self.servidor+"/maximo/rest/mbo/PERSON/"
-        #querystring = {"personid":usuario,"_format":"json"}
-        #conn = http.client.HTTPConnection(self.servidor)
-        #payload = ""
-        #senha = str(encoder_maxauth)
-        #print(senha[1:])
-        #headers = {
-        #   'maxauth': senha[1:],
-        #   'cache-control': "no-cache",
-        #   'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
-        #   }
-        #print('Chegou no headers')
-        #conn.request("GET", self.urlHttp+"/maximo/rest/mbo/PERSON?_format=json&personid="+usuario, payload, headers)
-        #res = conn.getresponse()
-        #data = res.read()
-        #print(data.decode("utf-8"))
-        #response = data.decode("utf-8")
-        #if response[:21] == "Error 400: BMXAA7901E":
-        #	print("ERRO......")
-        #else:
-        #self.changeScreen()
-        myreportswscreen = self.manager.ids.MyReportSWScreen
-        self.manager.current = 'MyReportSWScreen'
+        password = ''
+        password = senha
+        print(len(senha))
+        noencoder_maxauth= usuario+':'+senha
+        encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        url = self.servidor+"/maximo/rest/mbo/PERSON/"
+        querystring = {"personid":usuario,"_format":"json"}
+        conn = http.client.HTTPConnection(self.servidor)
+        payload = ""
+        senha = str(encoder_maxauth)
+        print(senha[1:])
+        headers = {
+           'maxauth': senha[1:],
+           'cache-control': "no-cache",
+           'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
+           }
+        
+        print('Chegou no headers')
+        if  password != '' and usuario != '':
+            print('Entrou no if de user')
+            conn.request("GET", self.urlHttp+"/maximo/rest/mbo/PERSON?_format=json&personid="+usuario, payload, headers)
+            res = conn.getresponse()
+            data = res.read()
+            print(data.decode("utf-8"))
+            response = data.decode("utf-8")
+            if response[:21] == "Error 400: BMXAA7901E":
+            	print("Usuario ou Senha incorreto")
+            else:
+            #self.changeScreen()
+                myreportswscreen = self.manager.ids.MyReportSWScreen
+                self.manager.current = 'MyReportSWScreen'
+                JsonRestMaximo.jsonGetLabor(self,usuario, password)
+        else:
+            print('Preencha os campos obrigatorios')
         #MyReportSWScreen.listSRandWO(self)
     #    #self.bind(on_press=self.myreportswscreen.transTela)
 
