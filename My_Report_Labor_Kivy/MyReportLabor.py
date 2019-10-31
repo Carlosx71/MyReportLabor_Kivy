@@ -74,7 +74,7 @@ class JsonRestMaximo(Screen):
         conn.request("GET", '/maximo/rest/mbo/LABOR?_format=json&personid="'+usuario+'"', payload, headers)
         res = conn.getresponse()
         data = res.read()
-        print("\033[33m" + data.decode("utf-8") + "\033[m")
+        print(data.decode("utf-8"))
         response = data.decode("utf-8")
         #response = requests.request("GET", url, data=payload, headers=h, params=querystring)
         #print(response.text)
@@ -83,10 +83,82 @@ class JsonRestMaximo(Screen):
         labor = jsonToPython["LABORMboSet"]['LABOR'][0]
         attributes = labor['Attributes']
         print(attributes.get('LABORCODE').get('content'))
-        #return attributes.get('LABORCODE').get('content')++
+        return attributes.get('LABORCODE').get('content')
+    
+    def jsonWOSR(self, user, passw, labor):
+        usuario = user   		
+        senha = passw
+        noencoder_maxauth = usuario+':'+senha
+        encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        laborcode = labor
+        servidor = MyReportLoginScreen.servidor
+        #url = self.sevidor+"/maximo/rest/mbo/WPLABOR/?_format=json&laborcode="+laborcode
+        url = servidor+"/maximo/oslc/script/MAXINSTWORKITENS_SR"
+        querystring = ""
+        conn = http.client.HTTPConnection("suporte.maxinst.intra")
+        payload = ""
+        senha = str(encoder_maxauth)
+        print(senha[1:])
+        headers = {
+           'maxauth': senha[1:],
+           'cache-control': "no-cache",
+           'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
+           }
+        print(headers)
+        print(url)
+        #h = json.loads(headers)
+        #response = requests.request("GET", url, data=payload, headers=h, params=querystring)
+        #print(response.text)
+        conn.request("GET", "http://suporte.maxinst.intra/maximo/oslc/script/MAXINSTWORKITENS_SR?_format=json", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print("\033[33m" + data.decode("utf-8") +"\033[m")	
+        response = data.decode("utf-8")	
+        #binary = response.text
+        jsonToPython = json.loads(response)
+        self.workitens_sr_des = json.loads(response)
+        '''
+        text = '{"data": [{"description": "Workitem Maxinst para Reuni","workitem": "MAX0REUNI"},{"description": "Tarefa Teste","taskid": "10","workitem": "MAX0TESTE"},{"description": "teste da OS de workitem","workitem": "MAX0PROJET"},{"description": "MAXTESTEAPONT","workitem": "MAX0TESTE"}]}'
+        jsonToPython = json.loads(text)
+        self.workitens_sr_des = json.loads(text)
+        '''
+        workitens_sr_descricao = '{"'
+        workitens = '{"workitens":["'
+        for wplabor in jsonToPython["data"]:
+        	#attributes=wplabor['Attributes']
+        	wpdescription = wplabor.get('description')
+        	wpdescription=wpdescription.replace('"','')
+        	wpdescription=wpdescription.replace("'","")
+        	workitemdesc=wplabor.get('workitem')
+        	workitemdesc = workitemdesc.replace('"','')
+        	workitemdesc = workitemdesc.replace("'","")
+        	#workitens = workitens + wplabor.get('workitem') + '","'
+        	#workitens_sr_descricao = workitens_sr_descricao + wplabor.get('workitem')  +'":"' +  wplabor.get('description') + '","'
+        	workitens = workitens + workitemdesc + '","'
+        	workitens_sr_descricao = workitens_sr_descricao + wplabor.get('workitem')  +'":"' +  wpdescription + '","'
+
+        if workitens != '{"workitens":["':
+        	#print (workitens)
+        	#print(workitens_sr_descricao)
+        	workitens=workitens[:-2]
+        	workitens=workitens+']}'
+        	#print (workitens)
+        	workitens_sr_descricao=workitens_sr_descricao[:-2]
+        	workitens_sr_descricao=workitens_sr_descricao+'}'
+        	#print(workitens_sr_descricao)
+        	self.workitens_sr_des = json.loads(workitens_sr_descricao)
+        	#print(self.workitens_sr_des)
+        	#print(workitens)
+        	print("\033[37m"+ workitens + "\033[m")
+        	return workitens
+        else:
+        	return None
+    
+
 
 class MyReportScreen(ScreenManager):
     pass
+
 
 class MyReportLoginScreen(Screen):
 
@@ -94,6 +166,7 @@ class MyReportLoginScreen(Screen):
     #self.servidor = "suportedev.maxinst.intra"
     urlHttp = "http://suporte.maxinst.intra"
     servidor = "suporte.maxinst.intra"
+    
     #def changeScreen(self):
     #    myreportswscreen = self.manager.ids.MyReportSWScreen
     #    self.manager.current = 'MyReportSWScreen'
@@ -138,13 +211,12 @@ class MyReportLoginScreen(Screen):
                 myreportswscreen = self.manager.ids.MyReportSWScreen
                 self.manager.current = 'MyReportSWScreen'
                 JsonRestMaximo.jsonGetLabor(self,usuario, password)
+                MyReportSWScreen.usuario = usuario
+                MyReportSWScreen.password = password
         else:
             print('Preencha os campos obrigatorios')
         #MyReportSWScreen.listSRandWO(self)
     #    #self.bind(on_press=self.myreportswscreen.transTela)
-
-
-
     #def load(self, pessoa):
     #    #Instaciando a tela para navegacao buscando no arquivo KV
     #    myreportswscreen = self.manager.ids.MyReportSWScreen
@@ -184,23 +256,6 @@ class MyButton(Button):
         #woscreen = self.manager.ids.WOScreen
         #self.manager.current = 'WOScreen'
 
-class MyButton(Button):
-    def __init__(self,screen, nome, idade,num, **kwargs):
-        super(MyButton, self).__init__(**kwargs)
-
-        #Construindo o botao
-        self.id = 'buttonList'+num
-        self.text = nome
-        self.size_hint_y = None
-        self.width = self.width * 0.500
-        self.height = '50dp'
-        self.background_color = 255,255,255,1
-        self.color = 0,0,0,1
-        self.background_normal
-        #Amarra para tela MyReportSWScreen
-        self.screen = screen
-        #self.screens1 = screen
-        self.bind(on_press=self.screen.transTelaWOScreen)
 
 class MyButtonWO(Button):
     def __init__(self,screen, nome, idade,num, **kwargs):
@@ -224,16 +279,22 @@ class MyButtonWO(Button):
 
 class MyReportSWScreen(Screen):
     num = 0
-    btn = ObjectProperty(None)
+    usuario = ''
+    password = ''
     def transTela(self, *args):
         self.manager.current = 'WOScreen'
 
     def count(self):
         pass
+
     def listSRandWO(self):
+        print("----->>>>> " + self.usuario + " <<<<<------")
+        print("----->>>>> " + self.password + " <<<<<------")
         woScreen = self.manager.ids.WOScreen
         print('listSRandWO')
         jsonPessoa = JsonRestMaximo.jsonRest
+        labor = JsonRestMaximo.jsonGetLabor(self, self.usuario, self.password)
+        print(str(labor))
         self.num = self.num + 1
         for x, i in jsonPessoa[0]['Carlos'].items():
         #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
@@ -244,6 +305,7 @@ class MyReportSWScreen(Screen):
             else:
                 self.ids.boxSRWO.remove_widget(MyButtonWO(woScreen, i['nome'], i['idade'], str(self.num)))
         print(self.num)
+        print(str(JsonRestMaximo.jsonWOSR(self, self.usuario, self.password, labor)))
         #noencoder_maxauth=usuario+':'+senha
         #encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
         #laborcode = self.recuperaLabor()
