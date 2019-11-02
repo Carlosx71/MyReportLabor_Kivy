@@ -1,6 +1,7 @@
 #from win10toast import ToastNotifier 
 from datetime import timedelta, date
 from threading import Thread
+from collections import defaultdict
 import http.client, urllib.parse
 import datetime
 import base64
@@ -69,16 +70,11 @@ class JsonRestMaximo(Screen):
            'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
            }
         conn = http.client.HTTPConnection("suporte.maxinst.intra")
-        #print(headers)
-        #h = json.loads(headers)
         conn.request("GET", '/maximo/rest/mbo/LABOR?_format=json&personid="'+usuario+'"', payload, headers)
         res = conn.getresponse()
         data = res.read()
         print(data.decode("utf-8"))
         response = data.decode("utf-8")
-        #response = requests.request("GET", url, data=payload, headers=h, params=querystring)
-        #print(response.text)
-        #binary = response.text
         jsonToPython = json.loads(response)
         labor = jsonToPython["LABORMboSet"]['LABOR'][0]
         attributes = labor['Attributes']
@@ -106,15 +102,11 @@ class JsonRestMaximo(Screen):
            }
         print(headers)
         print(url)
-        #h = json.loads(headers)
-        #response = requests.request("GET", url, data=payload, headers=h, params=querystring)
-        #print(response.text)
         conn.request("GET", "http://suporte.maxinst.intra/maximo/oslc/script/MAXINSTWORKITENS_SR?_format=json", payload, headers)
         res = conn.getresponse()
         data = res.read()
         print("\033[33m" + data.decode("utf-8") +"\033[m")	
         response = data.decode("utf-8")	
-        #binary = response.text
         jsonToPython = json.loads(response)
         self.workitens_sr_des = json.loads(response)
         '''
@@ -125,32 +117,23 @@ class JsonRestMaximo(Screen):
         workitens_sr_descricao = '{"'
         workitens = '{"workitens":["'
         for wplabor in jsonToPython["data"]:
-        	#attributes=wplabor['Attributes']
         	wpdescription = wplabor.get('description')
         	wpdescription=wpdescription.replace('"','')
         	wpdescription=wpdescription.replace("'","")
         	workitemdesc=wplabor.get('workitem')
         	workitemdesc = workitemdesc.replace('"','')
         	workitemdesc = workitemdesc.replace("'","")
-        	#workitens = workitens + wplabor.get('workitem') + '","'
-        	#workitens_sr_descricao = workitens_sr_descricao + wplabor.get('workitem')  +'":"' +  wplabor.get('description') + '","'
         	workitens = workitens + workitemdesc + '","'
         	workitens_sr_descricao = workitens_sr_descricao + wplabor.get('workitem')  +'":"' +  wpdescription + '","'
 
         if workitens != '{"workitens":["':
-        	#print (workitens)
-        	#print(workitens_sr_descricao)
         	workitens=workitens[:-2]
         	workitens=workitens+']}'
-        	#print (workitens)
         	workitens_sr_descricao=workitens_sr_descricao[:-2]
         	workitens_sr_descricao=workitens_sr_descricao+'}'
-        	#print(workitens_sr_descricao)
         	self.workitens_sr_des = json.loads(workitens_sr_descricao)
-        	#print(self.workitens_sr_des)
-        	#print(workitens)
         	print("\033[37m"+ workitens + "\033[m")
-        	return workitens
+        	return data
         else:
         	return None
     
@@ -162,8 +145,6 @@ class MyReportScreen(ScreenManager):
 
 class MyReportLoginScreen(Screen):
 
-    #self.urlHttp = "http://suportedev.maxinst.intra"
-    #self.servidor = "suportedev.maxinst.intra"
     urlHttp = "http://suporte.maxinst.intra"
     servidor = "suporte.maxinst.intra"
     
@@ -216,24 +197,6 @@ class MyReportLoginScreen(Screen):
         else:
             print('Preencha os campos obrigatorios')
         #MyReportSWScreen.listSRandWO(self)
-    #    #self.bind(on_press=self.myreportswscreen.transTela)
-    #def load(self, pessoa):
-    #    #Instaciando a tela para navegacao buscando no arquivo KV
-    #    myreportswscreen = self.manager.ids.MyReportSWScreen
-    #    #Pega a lista do jsonRest
-    #    jsonPessoa = JsonRestMaximo.jsonRest
-    #    if pessoa == 'Carlos':
-    #        for x, i in jsonPessoa[0]['Carlos'].items():
-    #            #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
-    #            self.ids.box1.add_widget(MyButton(myreportswscreen, i['nome'], i['idade']))
-    #            print(str(x))
-    #            print(str(i))
-    #    elif pessoa == 'Veronica':
-    #        for x, i in jsonPessoa[1]['Veronica'].items():
-    #            #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
-    #            self.ids.box1.add_widget(MyButton(myreportswscreen, i['nome'], i['idade']))
-    #            print(str(x))
-    #            print(str(i))
 
 class MyButton(Button):
     def __init__(self,screen, nome, idade,num, **kwargs):
@@ -258,7 +221,7 @@ class MyButton(Button):
 
 
 class MyButtonWO(Button):
-    def __init__(self,screen, nome, idade,num, **kwargs):
+    def __init__(self,screen, nome, num, **kwargs):
         super(MyButtonWO, self).__init__(**kwargs)
 
         #Construindo o botao
@@ -294,70 +257,24 @@ class MyReportSWScreen(Screen):
         print('listSRandWO')
         jsonPessoa = JsonRestMaximo.jsonRest
         labor = JsonRestMaximo.jsonGetLabor(self, self.usuario, self.password)
+        jsonWOSRstr = JsonRestMaximo.jsonWOSR(self, self.usuario, self.password, labor)
+        jsonWOSR = json.loads(jsonWOSRstr)
+        print("\033[33m"+str(jsonWOSRstr.decode("UTF-8"))+"\033[m")
         print(str(labor))
+        print(str(jsonWOSR))
         self.num = self.num + 1
-        for x, i in jsonPessoa[0]['Carlos'].items():
-        #Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
+        for x in jsonWOSR['data']:
+            #for k, v in x.items():
+            #    print(v)
+            #    #print(v)
+            ##Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
             if self.num == 1:
-                self.ids.boxSRWO.add_widget(MyButtonWO(woScreen, i['nome'], i['idade'], str(self.num)))
-                print(str(x))
-                print(str(i))
+                self.ids.boxSRWO.add_widget(MyButtonWO(woScreen, x['workitem'], str(self.num)))        
+                #print(str(i))
             else:
-                self.ids.boxSRWO.remove_widget(MyButtonWO(woScreen, i['nome'], i['idade'], str(self.num)))
+                self.ids.boxSRWO.remove_widget(MyButtonWO(woScreen, x['workitem'], str(self.num)))
         print(self.num)
-        print(str(JsonRestMaximo.jsonWOSR(self, self.usuario, self.password, labor)))
-        #noencoder_maxauth=usuario+':'+senha
-        #encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
-        #laborcode = self.recuperaLabor()
-        ##url = self.sevidor+"/maximo/rest/mbo/WPLABOR/?_format=json&laborcode="+laborcode
-        #url = self.urlHttp+"/maximo/oslc/script/MAXINSTWORKITENS_SR"
-        #querystring = ""
-        #conn = http.client.HTTPConnection(self.servidor)
-        #payload = ""
-        #senha = str(encoder_maxauth)
-        #print(senha[1:])
-        #headers = {
-        #   'maxauth': senha[1:],
-        #   'cache-control': "no-cache",
-        #   'Postman-Token': "7d953751-3549-4a4c-b943-c8b09266463e"
-        #   }
-        #print(headers)
-        #print(url)       
-        #conn.request("GET", self.urlHttp+"/maximo/oslc/script/MAXINSTWORKITENS_SR?_format=json", payload, headers)
-        #res = conn.getresponse()
-        #data = res.read()
-        #print('\033[32m '+data.decode("utf-8")+' \033[m')	
-        #response = data.decode("utf-8")	
-        ##binary = response.text
-        #jsonToPython = json.loads(response)
-        #self.workitens_sr_des = json.loads(response)
-        #'''
-        #text = '{"data": [{"description": "Workitem Maxinst para Reuni","workitem": "MAX0REUNI"},{"description": "Tarefa Teste","taskid": "10","workitem": "MAX0TESTE"},{"description": "teste da OS de workitem","workitem": "MAX0PROJET"},{"description": "MAXTESTEAPONT","workitem": "MAX0TESTE"}]}'
-        #jsonToPython = json.loads(text)
-        #self.workitens_sr_des = json.loads(text)
-        #'''
-        
-        #workitens_sr_descricao = '{"'
-        #workitens = '{"workitens":["'
-        #for wplabor in jsonToPython["data"]:
-        #	wpdescription = wplabor.get('description')
-        #	wpdescription=wpdescription.replace('"','')
-        #	wpdescription=wpdescription.replace("'","")
-        #	workitemdesc=wplabor.get('workitem')
-        #	workitemdesc = workitemdesc.replace('"','')
-        #	workitemdesc = workitemdesc.replace("'","")
-        #	workitens = workitens + workitemdesc + '","'
-        #	workitens_sr_descricao = workitens_sr_descricao + wplabor.get('workitem')  +'":"' +  wpdescription + '","'
-        #
-        #if workitens != '{"workitens":["':
-        #	workitens=workitens[:-2]
-        #	workitens=workitens+']}'
-        #	workitens_sr_descricao=workitens_sr_descricao[:-2]
-        #	workitens_sr_descricao=workitens_sr_descricao+'}'
-        #	self.workitens_sr_des = json.loads(workitens_sr_descricao)
-        #	return workitens
-        #else:
-        #	return None
+
 class WOScreen(Screen):
     def transTelaWOScreen(self, *args):
         self.manager.current = 'WOScreen'
