@@ -70,7 +70,6 @@
                     height: '30dp'
                 TextInput:
                     id: username
-                    text: ''
                     size_hint_y: None
                     height: '30dp'
                     size_hint_x: None
@@ -86,7 +85,6 @@
                     id: password
                     size_hint_y: None
                     height: '30dp'
-                    text: ''
                     password: True
                     size_hint_x: None
                     width: self.parent.width * 0.500
@@ -195,6 +193,7 @@
     #    Rectangle:
     #        pos: self.pos
     #        size: self.size
+    woDesc: woDesc
     BoxLayout:
         #Barra superior
         orientation: 'vertical'
@@ -206,6 +205,7 @@
                     title: 'My Report Labor - Work Orders'
                     app_icon: ''
         BoxLayout:
+            id: boxWO
             orientation: 'vertical'
             #padding: 30
             #    canvas.before:
@@ -232,7 +232,6 @@
                         height: '20dp'
                     TextInput:
                         id: workOrder
-                        text: 'WO1026'
                         size_hint: None, None
                         width: self.parent.width * 0.400
                         height: '30dp'
@@ -250,7 +249,6 @@
                         height: '20dp'
                     TextInput:
                         id: woDesc
-                        text: ''
                         size_hint: None, None
                         width: self.parent.width * 0.700
                         height: '30dp'

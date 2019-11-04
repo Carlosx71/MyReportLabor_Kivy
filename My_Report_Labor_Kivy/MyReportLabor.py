@@ -2,6 +2,7 @@
 from datetime import timedelta, date
 from threading import Thread
 from collections import defaultdict
+from functools import partial
 import http.client, urllib.parse
 import datetime
 import base64
@@ -147,7 +148,6 @@ class MyReportLoginScreen(Screen):
 
     urlHttp = "http://suporte.maxinst.intra"
     servidor = "suporte.maxinst.intra"
-    
     #def changeScreen(self):
     #    myreportswscreen = self.manager.ids.MyReportSWScreen
     #    self.manager.current = 'MyReportSWScreen'
@@ -158,11 +158,12 @@ class MyReportLoginScreen(Screen):
     def login(self):
         #print(str(username) + str(password))
         print('Entrou no Login')
+        for key, val in self.ids.items():
+            print("key={0}, val={1}".format(key, val))
         usuario = self.username.text
         senha = self.password.text
         password = ''
         password = senha
-        print(len(senha))
         noencoder_maxauth= usuario+':'+senha
         encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
         url = self.servidor+"/maximo/rest/mbo/PERSON/"
@@ -221,12 +222,12 @@ class MyButton(Button):
 
 
 class MyButtonWO(Button):
-    def __init__(self,screen, nome, num, **kwargs):
+    def __init__(self,screen, workitem, description, num, **kwargs):
         super(MyButtonWO, self).__init__(**kwargs)
 
         #Construindo o botao
         self.id = 'buttonList'+num
-        self.text = nome
+        self.text = workitem
         self.size_hint_y = None
         self.width = self.width * 0.500
         self.height = '50dp'
@@ -235,9 +236,10 @@ class MyButtonWO(Button):
         #self.background_normal
         #Amarra para tela MyReportSWScreen
         self.screen = screen
-        #self.screens1 = screen
+        #Callback para chamar a função com parametros
+        callback = partial(self.screen.setWO, workitem, description)
         self.bind(on_press=self.screen.transTelaWOScreen)
-        self.bind(on_press=self.screen.teste)
+        self.bind(on_press=callback)
 
 
 class MyReportSWScreen(Screen):
@@ -259,9 +261,6 @@ class MyReportSWScreen(Screen):
         labor = JsonRestMaximo.jsonGetLabor(self, self.usuario, self.password)
         jsonWOSRstr = JsonRestMaximo.jsonWOSR(self, self.usuario, self.password, labor)
         jsonWOSR = json.loads(jsonWOSRstr)
-        print("\033[33m"+str(jsonWOSRstr.decode("UTF-8"))+"\033[m")
-        print(str(labor))
-        print(str(jsonWOSR))
         self.num = self.num + 1
         for x in jsonWOSR['data']:
             #for k, v in x.items():
@@ -269,18 +268,24 @@ class MyReportSWScreen(Screen):
             #    #print(v)
             ##Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
             if self.num == 1:
-                self.ids.boxSRWO.add_widget(MyButtonWO(woScreen, x['workitem'], str(self.num)))        
+                self.ids.boxSRWO.add_widget(MyButtonWO(woScreen, x['workitem'], x['description'], str(self.num)))        
                 #print(str(i))
             else:
-                self.ids.boxSRWO.remove_widget(MyButtonWO(woScreen, x['workitem'], str(self.num)))
+                self.ids.boxSRWO.remove_widget(MyButtonWO(woScreen, x['workitem'], x['description'], str(self.num)))
         print(self.num)
 
 class WOScreen(Screen):
     def transTelaWOScreen(self, *args):
         self.manager.current = 'WOScreen'
 
-    def teste(self, *args):
-        print('To na WoScreen')
+    def setWO(self, workitem, description, *args):
+        print('To na WoScreen ', str(workitem))
+        for key, val in self.ids.items():
+            print("key={0}, val={1}".format(key, val))
+        self.ids.workOrder.text = workitem
+        self.ids.woDesc.text = description
+        print(str(args))
+
 
 class MyReportLaborApp(App):
     def build(self):
