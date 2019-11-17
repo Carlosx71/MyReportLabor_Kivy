@@ -26,34 +26,6 @@ from kivy.uix.accordion     import Accordion, AccordionItem
 from kivy.uix.stacklayout   import StackLayout
 
 class JsonRestMaximo(Screen):
-    jsonRest = [{'Carlos':{
-                    'Heroi 1': {
-                        'nome':'Dante', 
-                        'idade': 25,
-                        'cabelos': 'Brancos'
-                        }, 
-                    'Heroi 2': {
-                        'nome':'Kenshin', 
-                        'idade': 27,
-                        'cabelos': 'Negros'
-                        }                
-                    }
-                },
-                {'Veronica':{
-                    'Heroi 1': {
-                        'nome':'Alice', 
-                        'idade': 22,
-                        'cabelos': 'Castanhos'
-                        }, 
-                    'Heroi 2': {
-                        'nome':'Aru', 
-                        'idade': 20,
-                        'cabelos': 'Loiros'
-                        }                
-                    }
-                },                
-                ]
-
     def jsonGetLabor(self,username, password):
         usuario = username
         senha = password
@@ -246,6 +218,7 @@ class MyReportSWScreen(Screen):
     num = 0
     usuario = ''
     password = ''
+    laborName = ''
     def transTela(self, *args):
         self.manager.current = 'WOScreen'
 
@@ -257,15 +230,11 @@ class MyReportSWScreen(Screen):
         print("----->>>>> " + self.password + " <<<<<------")
         woScreen = self.manager.ids.WOScreen
         print('listSRandWO')
-        jsonPessoa = JsonRestMaximo.jsonRest
         labor = JsonRestMaximo.jsonGetLabor(self, self.usuario, self.password)
         jsonWOSRstr = JsonRestMaximo.jsonWOSR(self, self.usuario, self.password, labor)
         jsonWOSR = json.loads(jsonWOSRstr)
         self.num = self.num + 1
         for x in jsonWOSR['data']:
-            #for k, v in x.items():
-            #    print(v)
-            #    #print(v)
             ##Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
             if self.num == 1:
                 self.ids.boxSRWO.add_widget(MyButtonWO(woScreen, x['workitem'], x['description'], str(self.num)))        
@@ -275,6 +244,9 @@ class MyReportSWScreen(Screen):
         print(self.num)
 
 class WOScreen(Screen):
+    workitemWO = ''
+    descriptionWO = ''
+
     def transTelaWOScreen(self, *args):
         self.manager.current = 'WOScreen'
 
@@ -284,7 +256,89 @@ class WOScreen(Screen):
             print("key={0}, val={1}".format(key, val))
         self.ids.workOrder.text = workitem
         self.ids.woDesc.text = description
+        self.workitemWO = workitem
+        self.descriptionWO = description
         print(str(args))
+
+    def startActivity(self):
+        print("Start Activity")
+        self.iniciot = datetime.datetime.now()
+        di = datetime.datetime.now()-timedelta(minutes=1)
+        self.inicio_formatada = str(di)
+        self.starttime = self.inicio_formatada[self.inicio_formatada.find(' ')+1:self.inicio_formatada.find('.')]
+        self.inicio_formatada = self.inicio_formatada.replace(' ','T')
+        self.inicio_formatada = self.inicio_formatada[0:self.inicio_formatada.find('.')]
+        self.inicio_formatada = self.inicio_formatada + '-03:00'
+        self.iniciot=self.iniciot-timedelta(minutes=1)
+        self.ids.btnStartAct.disabled = True
+	
+    def endActivity(self):
+        df1 = datetime.datetime.now() - timedelta(minutes=1) 
+        fimdata_formatada = str(df1)
+        fimdata_formatada = fimdata_formatada.replace(' ','T')
+        fimdata_formatada = fimdata_formatada[0:fimdata_formatada.find('.')]
+        fimdata_formatada = fimdata_formatada + '-03:00'
+        finishtime = fimdata_formatada[fimdata_formatada.find(' ')+1:fimdata_formatada.find('.')]
+        finishdate = fimdata_formatada[0:fimdata_formatada.find(' ')]
+        print(fimdata_formatada)
+        chamado = self.workitemWO
+        #chamado = self.listbox.get(self.listbox.curselection())
+        #memo = self.memo.get()
+        laborcode = JsonRestMaximo.jsonGetLabor(self, MyReportSWScreen.usuario , MyReportSWScreen.password)
+        fim = datetime.datetime.now()
+        fim = fim - timedelta(minutes=1)
+        df = fim - self.iniciot
+        print(df)
+        dfs = str(df)
+        s = dfs.split('.')
+        hhmmss = s[0]
+        [hours, minutes, seconds] = [int(x) for x in hhmmss.split(':')]
+        x = datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        segundos=x.seconds
+        regularhrs=segundos/3600.0
+        print(regularhrs)
+        ##result = tkinter.messagebox.askyesno("Confirmacao","Confirma que gastou "+ str(df) + " no chamado\workitem "+str(chamado)+"?")
+        ###result = tkMessageBox.askyesno("Confirmacao","Confirma que gastou "+ str(df) + " no chamado\workitem "+str(chamado)+"?")
+        #print("language => " +self.language)
+        #if self.language == 'EN':
+        #	hrstr =str(regularhrs)
+        #else:
+        hrstr=str(regularhrs)
+        #	hrstr = hrstr.replace('.',',')
+        #egularhrs=1
+        url = "http://suporte.maxinst.intra/maximo/rest/mbo/LABTRANS/"
+        ################ --------------- >>>>> VERIFICAR QUANDO FOR SR <<<<< ---------------------- ####################
+        #if chamado[:2] == 'SR':
+        #	querystring = {"_action":"AddChange","LABORCODE":laborcode,"REGULARHRS":hrstr,"ticketid":chamado,"ticketclass":"SR","siteid":"SEDE","memo":memo,"STARTDATETIME":self.inicio_formatada,"FINISHDATETIME":fimdata_formatada,"STARTTIME":self.starttime}
+        querystring = {
+            "_action":"AddChange",
+            "LABORCODE":laborcode,
+            "REGULARHRS":hrstr,
+            "refwo":chamado,
+            "siteid":"SEDE",
+            "memo":"memo",
+            "STARTDATETIME":self.inicio_formatada,
+            "FINISHDATETIME":fimdata_formatada,
+            "STARTTIME":self.starttime
+        }
+        noencoder_maxauth = MyReportSWScreen.usuario +':'+ MyReportSWScreen.password
+        encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        payload = ""
+        headers = '{"maxauth":"Y2FybG9zLnNhbnRvczpjaG9iaXRz"}'
+        print(encoder_maxauth)
+        print(querystring)
+        h = json.loads(headers)
+        response = requests.request("POST", url, data=payload, headers=h, params=querystring)
+        print(response.text)
+        print(response.status_code)
+        self.ids.btnStartAct.disabled = False
+        #if (response.status_code == 200):
+        #	tkinter.messagebox.showinfo("Sucesso", "Registro gravado com sucesso!!!")
+        #else:
+        #	tkinter.messagebox.showerror ("Erro", "Não foi possivel gravar os dados no MAXIMO no momento!")
+
+        #print (result)
+
 
 
 class MyReportLaborApp(App):

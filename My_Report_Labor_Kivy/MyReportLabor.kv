@@ -250,10 +250,14 @@
                     TextInput:
                         id: woDesc
                         size_hint: None, None
-                        width: self.parent.width * 0.700
+                        width: self.parent.width * 1.5
                         height: '30dp'
                         multiline: False
                         disabled: True
+                Label:
+                    text: ''
+                    halign: 'left'
+
                 GridLayout:
                     rows: 2
                     cols: 1
@@ -286,11 +290,6 @@
                     text: ''
                     halign: 'left'
                     #text_size: self.size
-                    #valign: 'middle'
-                Label:
-                    text: ''
-                    halign: 'left'
-                    #text_size: self.size
                     #valign: 'middle'      
                 Label:
                     text: ''
@@ -312,11 +311,6 @@
                     #halign: 'left'
                     #text_size: self.size
                     #valign: 'middle'      
-                Label:
-                    text: ''
-                    #halign: 'left'
-                    #text_size: self.size
-                    #valign: 'middle'
                 Label:
                     text: ''
                     #halign: 'left'
@@ -328,8 +322,17 @@
                     #text_size: self.size
                     #valign: 'middle'
                 Button:
-                    text: 'Iniciar'
+                    id: btnStartAct
+                    text: 'Iniciar Atividade'
                     #width: '40dp'
+                    on_press: root.startActivity()
+                    background_color: 1,1.5,255,1
+                Button:
+                    id: btnEndAct
+                    text: 'Encerrar Atividade'
+                    #width: '40dp'
+                    on_press: root.endActivity()
+                    background_color: 1,1.5,255,1
                                             
 
         ScrollView:
