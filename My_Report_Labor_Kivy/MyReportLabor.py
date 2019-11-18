@@ -51,7 +51,9 @@ class JsonRestMaximo(Screen):
         jsonToPython = json.loads(response)
         labor = jsonToPython["LABORMboSet"]['LABOR'][0]
         attributes = labor['Attributes']
+        print(str(labor))
         print(attributes.get('LABORCODE').get('content'))
+        print("\033[34m" + str(attributes)+"\033[m" )
         return attributes.get('LABORCODE').get('content')
     
     def jsonWOSR(self, user, passw, labor):
@@ -162,11 +164,13 @@ class MyReportLoginScreen(Screen):
             	print("Usuario ou Senha incorreto")
             else:
             #self.changeScreen()
+                jsonToPython = json.loads(response)
                 myreportswscreen = self.manager.ids.MyReportSWScreen
                 self.manager.current = 'MyReportSWScreen'
                 JsonRestMaximo.jsonGetLabor(self,usuario, password)
                 MyReportSWScreen.usuario = usuario
                 MyReportSWScreen.password = password
+                MyReportSWScreen.language = jsonToPython["PERSONMboSet"]['PERSON'][0]['Attributes'].get('LANGUAGE').get('content')
         else:
             print('Preencha os campos obrigatorios')
         #MyReportSWScreen.listSRandWO(self)
@@ -218,7 +222,7 @@ class MyReportSWScreen(Screen):
     num = 0
     usuario = ''
     password = ''
-    laborName = ''
+    language = ''
     def transTela(self, *args):
         self.manager.current = 'WOScreen'
 
@@ -228,6 +232,7 @@ class MyReportSWScreen(Screen):
     def listSRandWO(self):
         print("----->>>>> " + self.usuario + " <<<<<------")
         print("----->>>>> " + self.password + " <<<<<------")
+        print("----->>>>> " + self.language + " <<<<<------")
         woScreen = self.manager.ids.WOScreen
         print('listSRandWO')
         labor = JsonRestMaximo.jsonGetLabor(self, self.usuario, self.password)
@@ -271,6 +276,7 @@ class WOScreen(Screen):
         self.inicio_formatada = self.inicio_formatada + '-03:00'
         self.iniciot=self.iniciot-timedelta(minutes=1)
         self.ids.btnStartAct.disabled = True
+        self.ids.btnEndAct.disabled = False
 	
     def endActivity(self):
         df1 = datetime.datetime.now() - timedelta(minutes=1) 
@@ -300,11 +306,11 @@ class WOScreen(Screen):
         ##result = tkinter.messagebox.askyesno("Confirmacao","Confirma que gastou "+ str(df) + " no chamado\workitem "+str(chamado)+"?")
         ###result = tkMessageBox.askyesno("Confirmacao","Confirma que gastou "+ str(df) + " no chamado\workitem "+str(chamado)+"?")
         #print("language => " +self.language)
-        #if self.language == 'EN':
-        #	hrstr =str(regularhrs)
-        #else:
-        hrstr=str(regularhrs)
-        #	hrstr = hrstr.replace('.',',')
+        if MyReportSWScreen.language  == 'EN':
+        	hrstr =str(regularhrs)
+        else:
+            hrstr = str(regularhrs)
+            hrstr = hrstr.replace('.',',')
         #egularhrs=1
         url = "http://suporte.maxinst.intra/maximo/rest/mbo/LABTRANS/"
         ################ --------------- >>>>> VERIFICAR QUANDO FOR SR <<<<< ---------------------- ####################
@@ -321,6 +327,17 @@ class WOScreen(Screen):
             "FINISHDATETIME":fimdata_formatada,
             "STARTTIME":self.starttime
         }
+        #querystring = {
+        #    "_action":"AddChange",
+        #    "LABORCODE":laborcode,
+        #    "REGULARHRS":"0,06138888888888889",
+        #    "refwo":chamado,
+        #    "siteid":"SEDE",
+        #    "memo":"memo",
+        #    "STARTDATETIME":self.inicio_formatada,
+        #    "FINISHDATETIME":fimdata_formatada,
+        #    "STARTTIME":self.starttime
+        #}
         noencoder_maxauth = MyReportSWScreen.usuario +':'+ MyReportSWScreen.password
         encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
         payload = ""
@@ -338,7 +355,7 @@ class WOScreen(Screen):
         #	tkinter.messagebox.showerror ("Erro", "Não foi possivel gravar os dados no MAXIMO no momento!")
 
         #print (result)
-
+        self.ids.btnEndAct.disabled = True
 
 
 class MyReportLaborApp(App):
