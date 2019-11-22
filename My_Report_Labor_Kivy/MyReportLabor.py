@@ -212,10 +212,16 @@ class MyButtonWO(Button):
         #self.background_normal
         #Amarra para tela MyReportSWScreen
         self.screen = screen
-        #Callback para chamar a função com parametros
-        callback = partial(self.screen.setWO, workitem, description)
-        self.bind(on_press=self.screen.transTelaWOScreen)
-        self.bind(on_press=callback)
+        if workitem[:2] == 'SR':
+            #Callback para chamar a função com parametros SR
+            callback = partial(self.screen.setSR, workitem, description)
+            self.bind(on_press=self.screen.transTelaSRScreen)
+            self.bind(on_press=callback)
+        else:
+            #Callback para chamar a função com parametros WO
+            callback = partial(self.screen.setWO, workitem, description)
+            self.bind(on_press=self.screen.transTelaWOScreen)
+            self.bind(on_press=callback)
 
 
 class MyReportSWScreen(Screen):
@@ -234,18 +240,26 @@ class MyReportSWScreen(Screen):
         print("----->>>>> " + self.password + " <<<<<------")
         print("----->>>>> " + self.language + " <<<<<------")
         woScreen = self.manager.ids.WOScreen
+        srScreen = self.manager.ids.SRScreen
         print('listSRandWO')
         labor = JsonRestMaximo.jsonGetLabor(self, self.usuario, self.password)
         jsonWOSRstr = JsonRestMaximo.jsonWOSR(self, self.usuario, self.password, labor)
         jsonWOSR = json.loads(jsonWOSRstr)
         self.num = self.num + 1
         for x in jsonWOSR['data']:
+            chamado = x['workitem']
+            print(chamado + ' Oi chamado')
+            if chamado[:2] == 'SR':
+                print('Entrou no sr screen')
+                screenID = srScreen
+            else:
+                screenID = woScreen
             ##Cria um botao de acordo com o discionario de dados. O box1 e um id que esta no arquivo KV
             if self.num == 1:
-                self.ids.boxSRWO.add_widget(MyButtonWO(woScreen, x['workitem'], x['description'], str(self.num)))        
+                self.ids.boxSRWO.add_widget(MyButtonWO(screenID, x['workitem'], x['description'], str(self.num)))        
                 #print(str(i))
             else:
-                self.ids.boxSRWO.remove_widget(MyButtonWO(woScreen, x['workitem'], x['description'], str(self.num)))
+                self.ids.boxSRWO.remove_widget(MyButtonWO(screenID, x['workitem'], x['description'], str(self.num)))
         print(self.num)
 
 class WOScreen(Screen):
@@ -275,8 +289,8 @@ class WOScreen(Screen):
         self.inicio_formatada = self.inicio_formatada[0:self.inicio_formatada.find('.')]
         self.inicio_formatada = self.inicio_formatada + '-03:00'
         self.iniciot=self.iniciot-timedelta(minutes=1)
-        self.ids.btnStartAct.disabled = True
-        self.ids.btnEndAct.disabled = False
+        self.ids.btnStartActWO.disabled = True
+        self.ids.btnEndActWO.disabled = False
 	
     def endActivity(self):
         df1 = datetime.datetime.now() - timedelta(minutes=1) 
@@ -348,15 +362,114 @@ class WOScreen(Screen):
         response = requests.request("POST", url, data=payload, headers=h, params=querystring)
         print(response.text)
         print(response.status_code)
-        self.ids.btnStartAct.disabled = False
+        self.ids.btnStartActWO.disabled = False
         #if (response.status_code == 200):
         #	tkinter.messagebox.showinfo("Sucesso", "Registro gravado com sucesso!!!")
         #else:
         #	tkinter.messagebox.showerror ("Erro", "Não foi possivel gravar os dados no MAXIMO no momento!")
 
         #print (result)
-        self.ids.btnEndAct.disabled = True
+        self.ids.btnEndActWO.disabled = True
 
+class SRScreen(Screen):
+    workitemSR = ''
+    descriptionSR = ''
+
+    def transTelaSRScreen(self, *args):
+        self.manager.current = 'SRScreen'
+
+    def setSR(self, workitem, description, *args):
+        print('To na WoScreen ', str(workitem))
+        for key, val in self.ids.items():
+            print("key={0}, val={1}".format(key, val))
+        self.ids.servResq.text = workitem
+        self.ids.srDesc.text = description
+        self.workitemSR = workitem
+        self.descriptionSR = description
+        print(str(args))
+
+    def startActivity(self):
+        print("Start Activity")
+        self.iniciot = datetime.datetime.now()
+        di = datetime.datetime.now()-timedelta(minutes=1)
+        self.inicio_formatada = str(di)
+        self.starttime = self.inicio_formatada[self.inicio_formatada.find(' ')+1:self.inicio_formatada.find('.')]
+        self.inicio_formatada = self.inicio_formatada.replace(' ','T')
+        self.inicio_formatada = self.inicio_formatada[0:self.inicio_formatada.find('.')]
+        self.inicio_formatada = self.inicio_formatada + '-03:00'
+        self.iniciot=self.iniciot-timedelta(minutes=1)
+        self.ids.btnStartActSR.disabled = True
+        self.ids.btnEndActSR.disabled = False
+	
+    def endActivity(self):
+        df1 = datetime.datetime.now() - timedelta(minutes=1) 
+        fimdata_formatada = str(df1)
+        fimdata_formatada = fimdata_formatada.replace(' ','T')
+        fimdata_formatada = fimdata_formatada[0:fimdata_formatada.find('.')]
+        fimdata_formatada = fimdata_formatada + '-03:00'
+        finishtime = fimdata_formatada[fimdata_formatada.find(' ')+1:fimdata_formatada.find('.')]
+        finishdate = fimdata_formatada[0:fimdata_formatada.find(' ')]
+        print(fimdata_formatada)
+        chamado = self.workitemSR
+        #chamado = self.listbox.get(self.listbox.curselection())
+        #memo = self.memo.get()
+        laborcode = JsonRestMaximo.jsonGetLabor(self, MyReportSWScreen.usuario , MyReportSWScreen.password)
+        fim = datetime.datetime.now()
+        fim = fim - timedelta(minutes=1)
+        df = fim - self.iniciot
+        print(df)
+        dfs = str(df)
+        s = dfs.split('.')
+        hhmmss = s[0]
+        [hours, minutes, seconds] = [int(x) for x in hhmmss.split(':')]
+        x = datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        segundos=x.seconds
+        regularhrs=segundos/3600.0
+        print(regularhrs)
+        ##result = tkinter.messagebox.askyesno("Confirmacao","Confirma que gastou "+ str(df) + " no chamado\workitem "+str(chamado)+"?")
+        ###result = tkMessageBox.askyesno("Confirmacao","Confirma que gastou "+ str(df) + " no chamado\workitem "+str(chamado)+"?")
+        #print("language => " +self.language)
+        if MyReportSWScreen.language  == 'EN':
+        	hrstr =str(regularhrs)
+        else:
+            hrstr = str(regularhrs)
+            hrstr = hrstr.replace('.',',')
+        #egularhrs=1
+        url = "http://suporte.maxinst.intra/maximo/rest/mbo/LABTRANS/"
+        ################ --------------- >>>>> VERIFICAR QUANDO FOR SR <<<<< ---------------------- ####################
+        #if chamado[:2] == 'SR':
+        #	querystring = {"_action":"AddChange","LABORCODE":laborcode,"REGULARHRS":hrstr,"ticketid":chamado,"ticketclass":"SR","siteid":"SEDE","memo":memo,"STARTDATETIME":self.inicio_formatada,"FINISHDATETIME":fimdata_formatada,"STARTTIME":self.starttime}
+        querystring = {
+            "_action":"AddChange",
+            "LABORCODE":laborcode,
+            "REGULARHRS":hrstr,
+            "ticketid":chamado,
+            "ticketclass":"SR",
+            "siteid":"SEDE",
+            "memo":"memo",
+            "STARTDATETIME":self.inicio_formatada,
+            "FINISHDATETIME":fimdata_formatada,
+            "STARTTIME":self.starttime
+        }
+
+        noencoder_maxauth = MyReportSWScreen.usuario +':'+ MyReportSWScreen.password
+        encoder_maxauth = base64.b64encode(noencoder_maxauth.encode())
+        payload = ""
+        headers = '{"maxauth":"Y2FybG9zLnNhbnRvczpjaG9iaXRz"}'
+        print(encoder_maxauth)
+        print(querystring)
+        h = json.loads(headers)
+        response = requests.request("POST", url, data=payload, headers=h, params=querystring)
+        print(response.text)
+        print(response.status_code)
+        self.ids.btnStartActSR.disabled = False
+        #if (response.status_code == 200):
+        #	tkinter.messagebox.showinfo("Sucesso", "Registro gravado com sucesso!!!")
+        #else:
+        #	tkinter.messagebox.showerror ("Erro", "Não foi possivel gravar os dados no MAXIMO no momento!")
+
+        #print (result)
+        self.ids.btnEndActSR.disabled = True
 
 class MyReportLaborApp(App):
     def build(self):

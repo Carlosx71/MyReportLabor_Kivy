@@ -15,6 +15,9 @@
     WOScreen:
         name: 'WOScreen'
         id: WOScreen
+    SRScreen:
+        name: 'SRScreen'
+        id: SRScreen
 
 <MyReportLoginScreen>:
     #Variaveis globais
@@ -251,6 +254,7 @@
                         id: woDesc
                         size_hint: None, None
                         width: self.parent.width * 1.5
+                        halign: 'left'
                         height: '30dp'
                         multiline: False
                         disabled: True
@@ -258,24 +262,11 @@
                     text: ''
                     halign: 'left'
 
-                GridLayout:
-                    rows: 2
-                    cols: 1
-                    padding: 5
-                    Label:
-                        text: 'Status:'
-                        halign: 'left'
-                        text_size: self.size
-                        size_hint_y: None
-                        height: '20dp'
-                    TextInput:
-                        id: woStatus
-                        text: ''
-                        size_hint: None, None
-                        width: self.parent.width * 0.400
-                        height: '30dp'
-                        multiline: False
-                        disabled: True                        
+                Label:
+                    text: ''
+                    halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'                      
                 Label:
                     text: ''
                     halign: 'left'
@@ -322,19 +313,155 @@
                     #text_size: self.size
                     #valign: 'middle'
                 Button:
-                    id: btnStartAct
+                    id: btnStartActSR
                     text: 'Iniciar Atividade'
                     #width: '40dp'
                     on_press: root.startActivity()
                     background_color: 1,1.5,255,1
                 Button:
-                    id: btnEndAct
+                    id: btnEndActSR
                     text: 'Encerrar Atividade'
                     #width: '40dp'
                     disabled: True
                     on_press: root.endActivity()
                     background_color: 1,1.5,255,1
-                                            
+
+<SRScreen>:
+    #canvas.before:
+    #    Color:
+    #        rgba: 14, 16, 36, 0.5
+    #    Rectangle:
+    #        pos: self.pos
+    #        size: self.size
+    srDesc: srDesc
+    BoxLayout:
+        #Barra superior
+        orientation: 'vertical'
+        ActionBar: 
+            ActionView:
+                ActionPrevious:
+                    #Volta para a tela de login
+                    on_release: root.manager.current = 'MyReportSWScreen'
+                    title: 'My Report Labor - Service Request'
+                    app_icon: ''
+        BoxLayout:
+            id: boxSR
+            orientation: 'vertical'
+            #padding: 30
+            #    canvas.before:
+            GridLayout:
+                rows: 5
+                cols: 3
+                padding: 20
+                spacing: 2
+                #size_hint_y: None
+                #height: self.minimum_height
+                row_default_height: '50dp'
+                #row_force_default: True
+                #rows_minimum: '100dp'
+
+                GridLayout:
+                    rows: 2
+                    cols: 1
+                    padding: 5
+                    Label:
+                        text: 'Service Request:'
+                        halign: 'left'
+                        text_size: self.size
+                        size_hint_y: None
+                        height: '20dp'
+                    TextInput:
+                        id: servResq
+                        size_hint: None, None
+                        width: self.parent.width * 0.400
+                        height: '30dp'
+                        multiline: False
+                        disabled: True  
+                GridLayout:
+                    rows: 2
+                    cols: 1
+                    padding: 5
+                    Label:
+                        text: 'Descricao:'
+                        halign: 'left'
+                        text_size: self.size
+                        size_hint_y: None
+                        height: '20dp'
+                    TextInput:
+                        id: srDesc
+                        size_hint: None, None
+                        width: self.parent.width * 1.5
+                        halign: 'left'
+                        height: '30dp'
+                        multiline: False
+                        disabled: True
+                Label:
+                    text: ''
+                    halign: 'left'
+
+                Label:
+                    text: ''
+                    halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'                      
+                Label:
+                    text: ''
+                    halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'
+                Label:
+                    text: ''
+                    halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'
+                Label:
+                    text: ''
+                    halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'      
+                Label:
+                    text: ''
+                    halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'
+                Label:
+                    text: ''
+                    #halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'      
+                Label:
+                    text: ''
+                    #halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'
+                Label:
+                    text: ''
+                    #halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'      
+                Label:
+                    text: ''
+                    #halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'
+                Label:
+                    text: ''
+                    #halign: 'left'
+                    #text_size: self.size
+                    #valign: 'middle'
+                Button:
+                    id: btnStartActSR
+                    text: 'Iniciar Atividade'
+                    #width: '40dp'
+                    on_press: root.startActivity()
+                    background_color: 1,1.5,255,1
+                Button:
+                    id: btnEndActSR
+                    text: 'Encerrar Atividade'
+                    #width: '40dp'
+                    disabled: True
+                    on_press: root.endActivity()
+                    background_color: 1,1.5,255,1                                            
 
         ScrollView:
             BoxLayout:
